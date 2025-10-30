@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <title>BuffsMarket</title>
+  <style>
+    .transition{
+      transition: all .4s !important;
+      -moz-transition: all .4s !important;
+      -webkit-transition:all .4s !important;
+      -o-transition: all .4s !important;
+      position:relative !important; 
+      cursor:pointer !important;
+    }
+    .navbar-custom {
+      background-color: #CFB87C;
+    }
+    .nav-link {
+      color: #312f2f !important;
+    }
+    .nav-link:hover {
+      color: gray !important;
+    }
+    .text-spacing {
+      padding-right: 5px !important;
+    }
+    .nav-spacing {
+      padding-top: 2px !important;
+      color: transparent !important;
+      background: linear-gradient(50deg, #030303,  50%, #312f2f) !important;
+      -webkit-background-clip: text !important;
+    }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+      <a class="navbar-brand nav-spacing" href="#">BuffsMarket</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link transition" href="/home">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link transition" href="/chat">Messages</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link transition" href="/mylistings">Your Listings</a>
+          </li>
+        </ul>
+        {{#if user.nickname}}
+        <!-- Search bar and account link -->
+        <form class="d-flex" method="GET" action="/search">
+        <div style="padding-right: 5px">
+<input class="form-control" type="search" name="query" placeholder="Search" aria-label="Search">
+        </div>
+          <div style="padding-right: 5px">
+<button class="btn btn-outline-dark"  type="submit">Search</button>
+          </div>
+        </form>
+        <div style="padding-right: 5px">
+<button type="button" class="btn btn-dark"  data-bs-toggle="modal" data-bs-target="#createListingModal">
+          Create new listing
+        </button>
+        </div>
+        <div>
+          <a href="/account" class="nav-link text-dark text-spacing"> {{user.nickname}} </a> 
+        </div>
+        {{/if}}
+      </div>
+    </div>
+  </nav>
+
+  <!-- Modal Structure -->
+<div class="modal fade" id="createListingModal" tabindex="-1" aria-labelledby="createListingModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createListingModalLabel">Create New Listing</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Form structure inside modal -->
+        <div class="create_container">
+          <form method="POST" action="/home" class="w-100" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label for="item_name" class="form-label">Item Name</label>
+              <input type="text" class="form-control" id="item_name" name="item_name" required>
+            </div>
+            <div class="mb-3">
+              {{> message}}
+              <label for="description" class="form-label">Item Description</label>
+              <input type="text" class="form-control" id="description" name="description" required>
+            </div>
+            <div id="imageUploadContainer">
+              <div class="mb-3 image-upload-group">
+                <label for="imageUpload" class="form-label">Upload Image</label>
+                <input type="file" id="imageUpload" name="image[]" accept="image/*" required />
+                <div id="uploadStatus"></div> <!-- To show upload status -->
+              </div>
+            </div>
+            <button type="button" id="addImageUpload"  class="btn custom-btn transition">+ Add More Images</button>
+            <script> //recreate the image upload button so that multiple images can be uploaded
+              document.getElementById('addImageUpload').addEventListener('click', function () {
+                // Create a new div for the image upload field
+                const newImageUploadGroup = document.createElement('div');
+                newImageUploadGroup.classList.add('mb-3', 'image-upload-group');
+
+                // New label 
+                const newLabel = document.createElement('label');
+                newLabel.classList.add('form-label');
+                newLabel.textContent = 'Upload Image';
+
+                // Create the input field
+                const newInput = document.createElement('input');
+                newInput.type = 'file';
+                newInput.name = 'image[]'; // Use array notation to allow multiple files
+                newInput.accept = 'image/*';
+                newInput.required = true;
+
+                // Create the upload status div
+                const uploadStatusDiv = document.createElement('div');
+
+                // Remove button code
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.textContent = 'Remove';
+                removeButton.classList.add('btn', 'btn-danger', 'btn-sm', 'mt-2');
+                
+                // create an event listener for the remove button
+                removeButton.addEventListener('click', function () {
+                  newImageUploadGroup.remove(); // Remove the entire group
+                });
+
+                // Append elements to the new div
+                newImageUploadGroup.appendChild(newLabel);
+                newImageUploadGroup.appendChild(newInput);
+                newImageUploadGroup.appendChild(uploadStatusDiv);
+                newImageUploadGroup.appendChild(removeButton);
+
+
+                // add the new div to the container so that the button will appear
+                document.getElementById('imageUploadContainer').appendChild(newImageUploadGroup);
+              });
+            </script>
+
+            <div class="mb-3">
+              <label for="pricing" class="form-label">Item Price</label>
+              <input type="number" min="0.00" step="0.01" class="form-control" id="pricing" name="pricing" required>
+            </div>
+            <script>
+              // Add an event listener for form submission
+              document.querySelector('form[action="/home"]').addEventListener('submit', function (e) {
+                const priceInput = document.getElementById('pricing');
+                const priceValue = priceInput.value;
+
+                // Check if the price exceeds 5 characters
+                if (priceValue.length > 5) {
+                  e.preventDefault(); // Prevent form submission
+                  alert('The price must be less than 5 characters. Please enter a valid price.');
+                  priceInput.focus(); // Set focus back to the price field
+                }
+              });
+            </script>
+
+            <button type="submit" class="btn custom-btn transition">Create Listing</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeo7F9M49M30+YT1q+glXv7z7L3EOzCtB1XXQz9Dfxsb5g7f" crossorigin="anonymous"></script>
+</body>
+</html>
