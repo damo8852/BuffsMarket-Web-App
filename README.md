@@ -25,7 +25,7 @@ Ethan Telang | etelangboulder | ette8193@colorado.edu
 - Online Render Website must be deployed.
 
 # Run online using:
-- Online Link: https://buffsmarket.onrender.com/
+- Online Link: https://buffsmarket.onrender.com/ (not currently online anymore)
 
 # Prerequisites to run locally
 - CU Account
